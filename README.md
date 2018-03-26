@@ -1,10 +1,10 @@
-<h1><img src="https://cdn.rawgit.com/herrbischoff/awesome-osx-command-line/master/assets/logo.svg" alt="Awesome OS X Command Line" width="600"></h1>
+<h1><img src="https://cdn.rawgit.com/herrbischoff/awesome-macos-command-line/master/assets/logo.svg" alt="Awesome OS X Command Line" width="600"></h1>
 
 > A curated list of shell commands and tools specific to OS X.
 >
 > _“You don’t have to know everything. You simply need to know where to find it when necessary.” (John Brunner)_
 
-[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome) [![Build Status](https://travis-ci.org/herrbischoff/awesome-osx-command-line.svg?branch=master)](https://travis-ci.org/herrbischoff/awesome-osx-command-line)
+[![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome) [![Build Status](https://travis-ci.org/herrbischoff/awesome-macos-command-line.svg?branch=master)](https://travis-ci.org/herrbischoff/awesome-macos-command-line)
 
 If you want to contribute, you are highly encouraged to do so. Please read the [contribution guidelines](contributing.md).
 
@@ -36,6 +36,7 @@ For more terminal shell goodness, please also see this list's sister list [Aweso
 - [Dock](#dock)
 - [Documents](#documents)
 - [Files, Disks and Volumes](#files-disks-and-volumes)
+    - [APFS](#apfs)
     - [Disk Images](#disk-images)
 - [Finder](#finder)
     - [Files and Folders](#files-and-folders)
@@ -341,12 +342,6 @@ defaults write com.apple.TextEdit RichText -int 0
 defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 ```
 
-#### Remove Smiley Face
-At next start the warning "Your Code installation appears to be corrupt. Please reinstall." will appear. That's fine, just click "Don't show again".
-```bash
-sed -i '' 's/\.send-feedback{display:inline-block}/\.send-feedback{display:none}/' /Applications/Visual\ Studio\ Code.app/Contents/Resources/app/out/vs/workbench/workbench.main.css
-```
-
 ## Backup
 
 ### Time Machine
@@ -398,6 +393,18 @@ echo "[Following]"
 echo ""
 
 log stream --style syslog --info --predicate "$filter"
+```
+
+#### Toggle Backup While on Battery
+```bash
+# Status
+sudo defaults read /Library/Preferences/com.apple.TimeMachine RequiresACPower
+
+# Enable (Default)
+sudo defaults write /Library/Preferences/com.apple.TimeMachine RequiresACPower -bool true
+
+# Disable
+sudo defaults write /Library/Preferences/com.apple.TimeMachine RequiresACPower -bool false
 ```
 
 #### Verify Backup
@@ -592,6 +599,41 @@ diskutil list
 A continuous stream of file system access info.
 ```bash
 sudo fs_usage
+```
+### APFS
+
+Available since High Sierra. There is no central utility and usage is inconsistent as most functionality is rolled into `tmutil`.
+
+#### Convert Volume from HFS+ to APFS
+```bash
+/System/Library/Filesystems/apfs.fs/Contents/Resources/hfs_convert /path/to/file/system
+```
+
+#### Create New APFS Filesystem
+```bash
+/System/Library/Filesystems/apfs.fs/Contents/Resources/newfs_apfs /path/to/device
+```
+
+#### Create Snapshot
+```bash
+tmutil localsnapshot
+```
+
+#### Delete Snapshot
+```bash
+tmutil deletelocalsnapshots com.apple.TimeMachine.2018-01-26-044042
+````
+
+#### List Snapshots
+```bash
+tmutil listlocalsnapshots /
+```
+
+#### Mount Snapshot
+Snapshots are read-only.
+```bash
+mkdir ~/mnt
+/System/Library/Filesystems/apfs.fs/Contents/Resources/mount_apfs -s com.apple.TimeMachine.2018-01-26-044042 / ~/mnt
 ```
 
 ### Disk Images
@@ -1189,9 +1231,14 @@ sudo lsof -i :80
 ```
 
 #### Show External IP Address
+Works if your ISP doesn't replace DNS requests (which it shouldn't).
 ```bash
 dig +short myip.opendns.com @resolver1.opendns.com
 ```
+Alternative that works on all networks.
+```bash
+curl -s https://api.ipify.org && echo
+````
 
 ### TFTP
 
