@@ -491,6 +491,17 @@ defaults write com.apple.dock no-bouncing -bool false && \
 killall Dock
 ```
 
+#### Lock the Dock Size
+```bash
+# Enable
+defaults write com.apple.Dock size-immutable -bool yes && \
+killall Dock
+
+# Disable (Default)
+defaults write com.apple.Dock size-immutable -bool no && \
+killall Dock
+```
+
 #### Reset Dock
 ```bash
 defaults delete com.apple.dock && \
@@ -516,10 +527,18 @@ defaults write com.apple.dock scroll-to-open -bool false && \
 killall Dock
 ```
 
+#### Enable Dock Autohide
+
+``` bash
+defaults write com.apple.dock autohide -bool true && \
+killall Dock
+```
+
 #### Set Auto Show/Hide Delay
 The float number defines the show/hide delay in ms.
 ```bash
-defaults write com.apple.Dock autohide-delay -float 0 && \
+defaults write com.apple.dock autohide-time-modifier -float 0.4 && \
+defaults write com.apple.dock autohide-delay -float 0 && \
 killall Dock
 ```
 
@@ -1367,7 +1386,7 @@ sudo spctl --master-disable
 
 #### Generate Secure Password and Copy to Clipboard
 ```bash
-LC_ALL=C tr -dc "[:alpha:][:alnum:]" < /dev/urandom | head -c 20 | pbcopy
+LC_ALL=C tr -dc "[:alnum:]" < /dev/urandom | head -c 20 | pbcopy
 ```
 
 ### Physical Access
