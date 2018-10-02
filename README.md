@@ -1,4 +1,4 @@
-<h1><img src="https://cdn.rawgit.com/herrbischoff/awesome-macos-command-line/master/assets/logo.svg" alt="Awesome OS X Command Line" width="600"></h1>
+<h1><img src="https://cdn.rawgit.com/herrbischoff/awesome-macos-command-line/cab824f0/assets/logo.svg" alt="Awesome macOS Command Line" width="600"></h1>
 
 > A curated list of shell commands and tools specific to OS X.
 >
@@ -39,6 +39,7 @@ For more terminal shell goodness, please also see this list's sister list [Aweso
     - [APFS](#apfs)
     - [Disk Images](#disk-images)
 - [Finder](#finder)
+    - [Desktop](#desktop)
     - [Files and Folders](#files-and-folders)
     - [Layout](#layout)
     - [Metadata Files](#metadata-files)
@@ -174,7 +175,7 @@ sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resourc
 sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -restart -agent -console
 
 # Deactivate and Stop the Remote Management Service
-sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop 
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop
 ```
 
 #### Enable and Disable Remote Desktop Sharing
@@ -256,7 +257,9 @@ set os_version to do shell script "sw_vers -productVersion"
 set mail_version to "V2"
 considering numeric strings
     if "10.10" <= os_version then set mail_version to "V3"
-    if "10.12" < os_version then set mail_version to "V4"
+    if "10.12" <= os_version then set mail_version to "V4"
+    if "10.13" <= os_version then set mail_version to "V5"
+    if "10.14" <= os_version then set mail_version to "V6"
 end considering
 
 set sizeBefore to do shell script "ls -lnah ~/Library/Mail/" & mail_version & "/MailData | grep -E 'Envelope Index$' | awk {'print $5'}"
@@ -365,7 +368,7 @@ sudo tmutil enablelocal
 sudo tmutil disablelocal
 ```
 
-Since High Sierra, you cannot disable local snapshots. Time Machine now always creates a local APFS snapshot and uses that snapshot as the data source to create a regular backup, rather than using the live disk as the source, as is the case with HFS formatted disks. 
+Since High Sierra, you cannot disable local snapshots. Time Machine now always creates a local APFS snapshot and uses that snapshot as the data source to create a regular backup, rather than using the live disk as the source, as is the case with HFS formatted disks.
 
 #### Prevent Time Machine from Prompting to Use New Hard Drives as Backup Volume
 ```bash
@@ -708,6 +711,56 @@ sudo asr -restore -noverify -source /path/to/diskimage.dmg -target /Volumes/Volu
 
 
 ## Finder
+
+### Desktop
+
+#### Show External Media
+External HDs, thumb drives, etc.
+```bash
+# Enable
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true && \
+killall Finder
+
+# Disable (Default)
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false && \
+killall Finder
+```
+
+#### Show Internal Media
+Built-in HDs or SSDs.
+```bash
+# Enable
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true && \
+killall Finder
+
+# Disable (Default)
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false && \
+killall Finder
+```
+
+#### Show Removable Media
+CDs, DVDs, iPods, etc.
+```bash
+# Enable
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true && \
+killall Finder
+
+# Disable (Default)
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false && \
+killall Finder
+```
+
+#### Show Network Volumes
+AFP, SMB, NFS, WebDAV, etc.
+```bash
+# Enable
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool true && \
+killall Finder
+
+# Disable (Default)
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool false && \
+killall Finder
+```
 
 ### Files and Folders
 
@@ -1232,6 +1285,22 @@ traceroute github.com
 
 ### SSH
 
+#### Permanently Add Private Key Passphrase to SSH Agent
+> Prior to macOS Sierra, ssh would present a dialog asking for your passphrase and would offer the option to store it into the keychain. This UI was deprecated some time ago and has been removed.
+>
+> Instead, a new UseKeychain option was introduced in macOS Sierra allowing users to specify whether they would like for the passphrase to be stored in the keychain. This option was enabled by default on macOS Sierra, which caused all passphrases to be stored in the keychain.
+>
+> This was not the intended default behavior, so this has been changed in macOS 10.12.2. ([Source](https://developer.apple.com/library/archive/technotes/tn2449/_index.html))
+```bash
+ssh-add -K /path/to/private_key
+```
+Then add to `~/.ssh/config`:
+```bash
+Host server.example.com
+    IdentityFile /path/to/private_key
+    UseKeychain yes
+```
+
 #### Remote Login
 ```bash
 # Enable remote login
@@ -1575,7 +1644,7 @@ sudo fdesetup status
 sudo fdesetup enable
 
 # Disable (Default)
-sudo fdestatus disable
+sudo fdesetup disable
 ```
 
 ### Information/Reports
@@ -1589,6 +1658,9 @@ sudo sysdiagnose -f ~/Desktop/
 
 #### Create Bootable Installer
 ```bash
+# High Sierra
+sudo /Applications/Install\ macOS\ High\ Sierra.app/Contents/Resources/createinstallmedia --volume /Volumes/MyVolume --applicationpath /Applications/Install\ macOS\ High\ Sierra.app
+
 # Sierra
 sudo /Applications/Install\ macOS\ Sierra.app/Contents/Resources/createinstallmedia --volume /Volumes/MyVolume --applicationpath /Applications/Install\ macOS\ Sierra.app
 
@@ -1859,6 +1931,7 @@ tput bel
 ### Alternative Terminals
 
 - [iTerm2](https://iterm2.com) - A better Terminal.app.
+- [kitty](https://sw.kovidgoyal.net/kitty/) - Modern, GPU-accelerated terminal emulator.
 
 ### Shells
 
